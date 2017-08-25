@@ -10,11 +10,11 @@ public class IntList {
     /**
      * First element of list.
      */
-    public int first;
+    private int first;
     /**
      * Remaining elements of list.
      */
-    public IntList rest;
+    private IntList rest;
 
     /**
      * A List with first FIRST0 and rest REST0.
@@ -30,6 +30,22 @@ public class IntList {
     public IntList() {
     /* NOTE: public IntList () { }  would also work. */
         this(0, null);
+    }
+
+    public static IntList reverse(IntList lst) {
+        if (lst == null) {
+            return null;
+        } else if (lst.rest == null) {
+            return new IntList(lst.first, null);
+        } else {
+            IntList result = reverse(lst.rest);
+            IntList pointer = result;
+            while (pointer.rest != null) {
+                pointer = pointer.rest;
+            }
+            pointer.rest = new IntList(lst.first, null);
+            return result;
+        }
     }
 
     /**
@@ -94,11 +110,11 @@ public class IntList {
         //recursive verstion
         if (A == null) {
             return B;
-        }else if(A.rest == null){
+        } else if (A.rest == null) {
             A.rest = B;
             return A;
-        }else{
-            return new IntList(A.first, dcatenate(A.rest,B));
+        } else {
+            return new IntList(A.first, dcatenate(A.rest, B));
         }
     }
 
@@ -114,12 +130,12 @@ public class IntList {
         return new IntList(A.first, catenate(A.rest, B));
         */
         //iteration version
-        if(A == null) {
+        if (A == null) {
             return B;
         }
         IntList result = new IntList(A.first, null);
         IntList pointer = result;
-        while(A.rest != null){
+        while (A.rest != null) {
             pointer.rest = new IntList(A.rest.first, null);
             pointer = pointer.rest;
             A = A.rest;
@@ -200,26 +216,29 @@ public class IntList {
         IntList tortoise = A;
         IntList hare = A;
 
-        if (A == null)
+        if (A == null) {
             return 0;
+        }
 
         int cnt = 0;
 
 
         while (true) {
             cnt++;
-            if (hare.rest != null)
+            if (hare.rest != null) {
                 hare = hare.rest.rest;
-            else
+            } else {
                 return 0;
-
+            }
             tortoise = tortoise.rest;
 
-            if (tortoise == null || hare == null)
+            if (tortoise == null || hare == null) {
                 return 0;
+            }
 
-            if (hare == tortoise)
+            if (hare == tortoise) {
                 return cnt;
+            }
         }
     }
 

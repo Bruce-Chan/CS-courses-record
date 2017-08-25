@@ -48,6 +48,6 @@ public class Traveler {
      }
 
     public boolean isStopped() {
-        return System.currentTimeMillis() - timeOfLastStop > EPSILON;
+        return true;
     }
 }
