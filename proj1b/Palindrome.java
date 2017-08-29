@@ -38,7 +38,11 @@ public class Palindrome {
 
 
     public static void main(String[] args){
-        System.out.println(3%10);
+        int[] a = new int[3];
+        a[0]=3;
+        a[1]=2;
+        a[2]=1;
+        System.out.println(a[-2]);
     }
 
 }
