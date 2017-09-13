@@ -49,7 +49,7 @@ public class Table {
         for(int colIndex = 0; colIndex < colNames.size(); colIndex++){
             Column currCol = new Column(colNames.get(colIndex),rows.size());
             for(Row r: rows){
-                currCol.add(r.items[colIndex]);
+                currCol.add(r.items.get(colIndex));
             }
             cols.add(currCol);
         }
@@ -59,7 +59,7 @@ public class Table {
     public Table(List<Column> cols){
         columns = cols;
         columnsNum = cols.size();
-        rowsNum = cols.get(0).items.length;
+        rowsNum = cols.get(0).items.size();
         columnNames = new ArrayList<>();
         rows = new ArrayList<>();
 
@@ -71,15 +71,16 @@ public class Table {
             Column col = cols.get(i);
             columnNames.add(col.name);
             for (int j = 0; j < rowsNum; j += 1){
-                rows.get(j).add(col.items[j]);
+                rows.get(j).add(col.items.get(j));
             }
         }
     }
 
     public void addRow(Row r) {
         rows.add(r);
+        rowsNum++;
         for(int i = 0; i < columnsNum; i++){
-            columns.get(i).add(r.items[i]);
+            columns.get(i).add(r.items.get(i));
         }
     }
 
@@ -102,7 +103,7 @@ public class Table {
             for(int t2RowIndex = 0; t2RowIndex< t2.rowsNum; t2RowIndex+=1){
                 int matchNum = 0;
                 for(ColumnPair cp: SNpairs.repeatedNameColPair){
-                    if(cp.col1.items[t1RowIndex]==cp.col2.items[t2RowIndex]){
+                    if(cp.col1.items.get(t1RowIndex)==cp.col2.items.get(t2RowIndex)){
                         matchNum++;
                     }
                 }
@@ -110,7 +111,7 @@ public class Table {
                     Row curr = new Row(newColsName.size()); // create a new Row
                     curr.addAll(t1.rows.get(t1RowIndex).items); //inserts items from table 1 matched Row to new row
                     for(int index: unrepeatedNameIndexInT2){
-                        curr.add(t2.rows.get(t2RowIndex).items[index]); // insert items from table 2 matched Row
+                        curr.add(t2.rows.get(t2RowIndex).items.get(index)); // insert items from table 2 matched Row
                     }
                     newRows.add(curr);
                 }

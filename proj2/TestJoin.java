@@ -14,8 +14,8 @@ public class TestJoin {
 
         for(int cIndex = 0; cIndex < tExcept.columnsNum; cIndex++){
             for(int rIndex = 0; rIndex < tExcept.rowsNum; rIndex++){
-                int except = tExcept.rows.get(rIndex).items[cIndex];
-                int actual = tActual.rows.get(rIndex).items[cIndex];
+                int except = tExcept.rows.get(rIndex).items.get(cIndex);
+                int actual = tActual.rows.get(rIndex).items.get(cIndex);
                 Assert.assertEquals(except,actual);
             }
         }
@@ -28,9 +28,9 @@ public class TestJoin {
              2    1    4
              2    3    5
          */
-        Column c0 = new Column("Fish",new int[]{1,2,2});
-        Column c1 = new Column("Dogs",new int[]{1,1,3});
-        Column c2 = new Column("Cats",new int[]{3,4,5});
+        Column c0 = new Column("Fish",new Integer[]{1,2,2});
+        Column c1 = new Column("Dogs",new Integer[]{1,1,3});
+        Column c2 = new Column("Cats",new Integer[]{3,4,5});
         List<Column> cols1 = new ArrayList<>();
         cols1.add(c0);
         cols1.add(c1);
@@ -43,10 +43,10 @@ public class TestJoin {
             13    4    50
          */
 
-        Column c5 = new Column("Fish",new int[]{2,2,13});
-        Column cAct = new Column("Fish",new int[]{2,2,13});
-        Column c3 = new Column("Dogs",new int[]{2,3,4});
-        Column c4 = new Column("Pigs",new int[]{30,40,50});
+        Column c5 = new Column("Fish",new Integer[]{2,2,13});
+        Column cAct = new Column("Fish",new Integer[]{2,2,13});
+        Column c3 = new Column("Dogs",new Integer[]{2,3,4});
+        Column c4 = new Column("Pigs",new Integer[]{30,40,50});
         List<Column> cols2 = new ArrayList<>();
         cols2.add(c3);
         cols2.add(c4);
@@ -57,10 +57,10 @@ public class TestJoin {
              2    3    5   30
          */
 
-        c0 = new Column("Fish",new int[]{2});
-        c1 = new Column("Dogs",new int[]{3});
-        c2 = new Column("Cats",new int[]{5});
-        c4 = new Column("Pigs",new int[]{40});
+        c0 = new Column("Fish",new Integer[]{2});
+        c1 = new Column("Dogs",new Integer[]{3});
+        c2 = new Column("Cats",new Integer[]{5});
+        c4 = new Column("Pigs",new Integer[]{40});
         List<Column> cols3 = new ArrayList<>();
         cols3.add(c0);
         cols3.add(c1);
@@ -70,10 +70,13 @@ public class TestJoin {
         Table tActual = Table.join(t1,t2);
         tableCompare(t3,tActual);
 
-        int[] arr = {3, 4, 7, 80};
+
+        Integer[] arr = {3, 4, 7, 80};
         Row r1 = new Row(arr);
+
         t3.addRow(r1);
         tActual.addRow(r1);
+        tableCompare(t3,tActual);
 
     }
 

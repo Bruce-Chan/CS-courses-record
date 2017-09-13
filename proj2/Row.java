@@ -1,28 +1,28 @@
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Row{
-    public int[] items;
+    public List<Integer> items;
     public int size;
 
     /* Constructor */
-    Row (int[] arr){
-        items = arr;
+    Row (Integer[] arr){
+        items = Arrays.asList(arr);
         size = arr.length;
     }
 
     Row (int num) {
-        items = new int[num];
+        items = new ArrayList<>();
         size = 0;
     }
 
     public void add(int i){
-        items[size] = i;
+        items.add(i);
         size++;
     }
 
-    public void addAll(int[] rowItems){
-        for(int i = 0; i < rowItems.length; i++){
-            add(rowItems[i]);
-        }
+    public void addAll(List<Integer> rowItems){
+        items.addAll(rowItems);
     }
 }
