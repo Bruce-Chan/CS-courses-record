@@ -5,7 +5,21 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class TestJoin {
+
+    public void tableCompare(Table tExcept, Table tActual){
+        Assert.assertEquals(tExcept.columnsNum,tActual.columnsNum);
+        Assert.assertEquals(tExcept.rowsNum,tActual.rowsNum);
+
+        for(int cIndex = 0; cIndex < tExcept.columnsNum; cIndex++){
+            for(int rIndex = 0; rIndex < tExcept.rowsNum; rIndex++){
+                int except = tExcept.rows.get(rIndex).items[cIndex];
+                int actual = tActual.rows.get(rIndex).items[cIndex];
+                Assert.assertEquals(except,actual);
+            }
+        }
+    }
 
     @Test
     public void jointTest() {
@@ -54,7 +68,13 @@ public class TestJoin {
         cols3.add(c4);
         Table t3 = new Table(cols3);
         Table tActual = Table.join(t1,t2);
-        Assert.assertEquals(t3,tActual);
+        tableCompare(t3,tActual);
+
+        int[] arr = {3, 4, 7, 80};
+        Row r1 = new Row(arr);
+        t3.addRow(r1);
+        tActual.addRow(r1);
+
     }
 
 }

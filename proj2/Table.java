@@ -4,33 +4,6 @@ import java.util.List;
 
 public class Table {
 
-    private static class Row{
-        private int[] items;
-        private int size;
-
-        /* Constructor */
-        Row (int[] arr){
-            items = arr;
-            size = arr.length;
-        }
-
-        Row (int num) {
-            items = new int[num];
-            size = 0;
-        }
-
-        private void add(int i){
-            items[size] = i;
-            size++;
-        }
-
-        private void addAll(int[] rowItems){
-            for(int i = 0; i < rowItems.length; i++){
-                add(rowItems[i]);
-            }
-        }
-    }
-
     private static class ColumnPair{
         private String nameOfPair;
         private Column col1;
@@ -65,11 +38,11 @@ public class Table {
         }
     }
 
-    private List<String> columnNames;
-    private List<Column> columns;
-    private List<Row> rows;
-    private int columnsNum;
-    private int rowsNum;
+    public List<String> columnNames;
+    public List<Column> columns;
+    public List<Row> rows;
+    public int columnsNum;
+    public int rowsNum;
 
     private static List<Column> rowsToColumns(List<Row> rows, List<String> colNames){
         List<Column> cols = new ArrayList<>();
@@ -100,6 +73,13 @@ public class Table {
             for (int j = 0; j < rowsNum; j += 1){
                 rows.get(j).add(col.items[j]);
             }
+        }
+    }
+
+    public void addRow(Row r) {
+        rows.add(r);
+        for(int i = 0; i < columnsNum; i++){
+            columns.get(i).add(r.items[i]);
         }
     }
 
