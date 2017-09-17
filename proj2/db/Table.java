@@ -45,6 +45,29 @@ public class Table {
         expandItem(columns, r);
     }
 
+    private String changeLine(String str){
+        str = str.substring(0,str.length() -1);
+        str+="\n";
+        return str;
+    }
+
+    @Override
+    public String toString() {
+        String result = "";
+        for(int i=0; i<columnsNum(); i++){
+            String colName = columnNames.get(i);
+            result+=(colName+" "+columns.get(i).type+",");
+        }
+        result = changeLine(result);
+        for(Row r : rows){
+            for(Object item : r.items){
+                result+=(item.toString() + ",");
+            }
+            result = changeLine(result);
+        }
+        return result;
+    }
+
 
     public static Table join(Table t1, Table t2, String newName){
 
