@@ -40,7 +40,7 @@ public class Table {
         }
     }
 
-    public void addRow(Row r) {
+    public void addRow(Row r) throws Exception{
         rows.add(r);
         expandItem(columns, r);
     }
@@ -56,7 +56,11 @@ public class Table {
         String result = "";
         for(int i=0; i<columnsNum(); i++){
             String colName = columnNames.get(i);
-            result+=(colName+" "+columns.get(i).type+",");
+            Class clazz = columns.get(i).type;
+            if(clazz==Integer.class){
+                clazz = int.class;
+            }
+            result+=(colName+" "+clazz.getSimpleName().toLowerCase()+",");
         }
         result = changeLine(result);
         for(Row r : rows){
@@ -65,6 +69,7 @@ public class Table {
             }
             result = changeLine(result);
         }
+        result = result.substring(0,result.length() -1);
         return result;
     }
 
@@ -104,7 +109,8 @@ public class Table {
             for(int t2RowIndex = 0; t2RowIndex< t2.rowsNum(); t2RowIndex+=1){
                 int matchNum = 0;
                 for(ColumnPair cp: SNpairs.repeatedNameColPair){
-                    if(cp.col1.items.get(t1RowIndex)==cp.col2.items.get(t2RowIndex)){
+                    if(cp.col1.items.get(t1RowIndex).equals(cp.col2.items.get(t2RowIndex))){
+                        //should be equals not '==' here
                         matchNum++;
                     }
                 }
@@ -120,7 +126,9 @@ public class Table {
                 }
             }
         }
-
+        if(newRows.size()==0){
+            return null;
+        }
         List<Column> newCols = rowsToColumns(newRows,newColsName);
         if(newCols.size()==0){
             return null;

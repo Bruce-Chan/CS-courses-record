@@ -38,8 +38,16 @@ public class Parse {
             return createTable(m.group(1));
         } else if ((m = LOAD_CMD.matcher(query)).matches()) {
             return loadTable(m.group(1));
+        } else if ((m = STORE_CMD.matcher(query)).matches()) {
+            return storeTable(m.group(1));
+        } else if ((m = DROP_CMD.matcher(query)).matches()) {
+            return dropTable(m.group(1));
+        } else if ((m = INSERT_CMD.matcher(query)).matches()) {
+            return insertRow(m.group(1));
         } else if ((m = PRINT_CMD.matcher(query)).matches()) {
             return printTable(m.group(1));
+        } else if ((m = SELECT_CMD.matcher(query)).matches()) {
+            return select(m.group(1));
         } else {
             return String.format("Malformed query: %s\n", query);
         }
@@ -87,7 +95,42 @@ public class Parse {
         }
     }
 
-    private static String printTable(String name){
+    private static String storeTable(String name) {
+        return Database.storeTable(name);
+    }
+
+    private static String printTable(String name) {
         return Database.printTable(name);
+    }
+
+    private static String insertRow(String expr) {
+        Matcher m = INSERT_CLS.matcher(expr);
+        if (!m.matches()) {
+            return String.format("Malformed insert: %s\n", expr);
+        } else {
+            return Database.insertRow( m.group(1), m.group(2));
+        }
+
+        //"trying to insert the row \"%s\" into the table %s\n", m.group(2), m.group(1));
+    }
+    private static String dropTable(String name) {
+        return Database.dropTable(name);
+    }
+
+    private static String select(String expr) {
+        Matcher m = SELECT_CLS.matcher(expr);
+        if (!m.matches()) {
+            return String.format("Malformed select: %s\n", expr);
+        }
+
+        String[] cols = m.group(1).split(COMMA);
+        String[] tables = m.group(2).split(COMMA);
+        String[] conds;
+        if(m.group(3)==null){
+            conds = null;
+        } else {
+            conds = m.group(3).split(AND);
+        }
+        return Database.select(cols,tables,conds);
     }
 }

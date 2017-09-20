@@ -9,9 +9,16 @@ public class TableHelper {
     /*
      * insert items from a row into each column
      */
-    static void expandItem(List<Column> cols, Row r){
+    static void expandItem(List<Column> cols, Row r) throws Exception{
         for(int i = 0; i < cols.size(); i++){
-            cols.get(i).add(r.items.get(i));
+            Column col = cols.get(i);
+            Object item = r.items.get(i);
+            if(item.getClass().equals(col.type)){
+                col.add(item);
+            } else{
+                throw new Exception("Error: provided value cannot be parsed into " +
+                        "the type of the column it is listed in");
+            }
         }
 
     }
@@ -56,7 +63,7 @@ public class TableHelper {
             List<Column> cols2 = t2.columns;
             for(int i1 =0; i1 < t1.columnsNum(); i1+=1){
                 for(int i2 =0; i2 < t2.columnsNum(); i2+=1){
-                    if(cols1.get(i1).name==cols2.get(i2).name){
+                    if(cols1.get(i1).name.equals(cols2.get(i2).name)){
                         ColumnPair colPair = new ColumnPair(cols1.get(i1),cols2.get(i2));
                         repeatedNameColPair.add(colPair);
                         RepeatedNum++;
@@ -72,7 +79,7 @@ public class TableHelper {
     static List<Column> rowsToColumns(List<Row> rows, List<String> colNames){
         List<Column> cols = new ArrayList<>();
         for(int colIndex = 0; colIndex < colNames.size(); colIndex++){
-            String colType = rows.get(0).items.get(0).getClass().toString();
+            Class colType = rows.get(0).items.get(0).getClass();
             Column currCol = new Column(colNames.get(colIndex),colType);
             try {
                 for (Row r : rows) {

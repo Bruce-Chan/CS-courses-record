@@ -1,6 +1,14 @@
+/*
+ * TODO: 1. fix the join (Done)
+ *       2. Condition
+ *       3. check select
+ *       4. Create select table
+ */
+
 package db;
 
 
+import java.io.PrintWriter;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -8,22 +16,24 @@ import java.util.regex.Matcher;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.File;
 
 
 import static db.Parse.eval;
 
 
 public class Database {
-    private static final String INTEGER = "\\d+";
+    private static String DATAADDRESS = "out/production/proj2/examples//";
+    private static final String INTEGER = "\\s*(\\d+)\\s*";
     private static final String STRING = "\'\\.*\'";
-    private static final String FLOAT = "^([+-]?\\d*\\.\\d*)$";
+    private static final String FLOAT = "^\\s*([+-]?\\d*\\.\\d*)\\s*$";
     private static final Pattern INTEGER_TYPE = Pattern.compile(INTEGER);
     private static final Pattern STRING_TYPE = Pattern.compile(STRING);
     private static final Pattern FLOAT_TYPE = Pattern.compile(FLOAT);
-    private static Map<String,Table> tableMap = new HashMap<>();
+    private static Map<String,Table> tableMap;
 
     public Database() {
-        // YOUR CODE HERE
+        tableMap = new HashMap<>();
     }
 
     public String transact(String query) {
@@ -44,11 +54,11 @@ public class Database {
                 String colName = args[0];
                 String colType = args[1];
                 if(colType.equals("integer")||colType.equals("int")){
-                    col = new Column<Integer>(colName,colType);
+                    col = new Column<Integer>(colName,Integer.class);
                 } else if(colType.equals("string")){
-                    col = new Column<String>(colName, colType);
+                    col = new Column<String>(colName, String.class);
                 } else if(colType.equals("float")){
-                    col = new Column<Float>(colName, colType);
+                    col = new Column<Float>(colName, Float.class);
                 } else {
                     throw new Exception(String.format(String.format("unknown class type: %s", colType)));
                 }
@@ -63,50 +73,145 @@ public class Database {
      * convert string to correspond type object
      */
     private static Object strToObj(String str){
-        if(INTEGER_TYPE.matcher(str).matches()){
-            return Integer.parseInt(str);
-        } else if(FLOAT_TYPE.matcher(str).matches()){
-            return Float.parseFloat(str);
+        Matcher m;
+        if((m=INTEGER_TYPE.matcher(str)).matches()){
+            return Integer.parseInt(m.group(1));
+        } else if((m=FLOAT_TYPE.matcher(str)).matches()){
+            return Float.parseFloat(m.group(1));
         } else{
             return str;
         }
     }
+    /*
+     * convert row line string to row
+     */
+    private static Row rowStrToRow(String line){
+        Row r = new Row();
+        String[] rowItemsStr = line.split(",");
+        for(String itemStr : rowItemsStr){
+            r.add(strToObj(itemStr));
+        }
+        return r;
+    }
 
     static String loadTable(String name) {
         BufferedReader br;
-        try{
-            br  = new BufferedReader(new FileReader("out/production/proj2/examples//"+name+".tbl"));
+        try {
+            br = new BufferedReader(new FileReader(DATAADDRESS + name + ".tbl"));
             String line;
             line = br.readLine();
-            String[] colsStr = line.split(",");
+            String[] colsStr = line.split(","); // get column name and number from first line
             Table newTable;
             try {
                 newTable = createNewTable(name, colsStr); // read first line and create table
-            } catch (Exception e){
-                return ""+e;
+            } catch (Exception e) {
+                return "" + e;
             }
-            while((line = br.readLine()) != null){
-                Row r = new Row();
-                String[] rowItemsStr = line.split(",");
-                for(String itemStr : rowItemsStr){
-                    r.add(strToObj(itemStr));
+            while ((line = br.readLine()) != null) {
+                Row r = rowStrToRow(line);
+                try {
+                    newTable.addRow(r); // add rows
+                } catch (Exception e) {
+                    return ""+e;
                 }
-                newTable.addRow(r);
             }
             return "";
-        } catch(IOException e){
+        } catch (IOException e) {
             return String.format("ERROR: TBL file not found: %s.tbl", name);
         }
+    }
+
+    static String storeTable(String name) {
+        try{
+            PrintWriter pw = new PrintWriter(DATAADDRESS+name+".tbl","UTF-8");
+            if(tableMap.containsKey(name)) {
+                String[] lines = tableMap.get(name).toString().split("\n");
+                for(String line : lines){
+                    pw.println(line);
+                }
+                pw.close();
+                return "";
+            } else{
+                return "ERROR: Table not found: "+name;
+            }
+        } catch (IOException e){
+            return ""+e;
+        }
+    }
+
+    static String dropTable(String name) {
+        if(tableMap.containsKey(name)) {
+            tableMap.remove(name);
+            return "";
+        } else {
+            return "ERROR: Table not found: "+name;
+        }
+    }
+
+    static String insertRow(String name, String line) {
+        if(tableMap.containsKey(name)) {
+            Row r = rowStrToRow(line);
+            Table t = tableMap.get(name);
+            if(t.columnsNum()==r.size){
+                try{
+                    t.addRow(r);
+                } catch (Exception e){
+                    return ""+e;
+                }
+                return "";
+            }
+            return "ERROE: the provided values doesn't match the column of the table: "+name;
+        } else {
+            return "ERROR: Table not found: "+name;
+        }
+
     }
 
     static String printTable(String name){
         if(tableMap.containsKey(name)){
             return tableMap.get(name).toString();
         } else {
-            return String.format("didn't create or load table: %s",name);
+            return "ERROR: Table not found: "+name;
         }
     }
 
+    static String select(String[] colStrs, String[] tables, String[] conds) {
+        List<Table> tbs = new ArrayList<>();
+        for(String tbStr : tables){
+            if(tableMap.containsKey(tbStr)){
+                tbs.add(tableMap.get(tbStr));
+            } else {
+                return String.format("Error: table %s doesn't exist",tbStr);
+            }
+        }
+        Table newTable;
+        if(tbs.size()>=1){
+            newTable = tbs.remove(0); // get the first table
+        } else {
+            return "Error: didn't select table";
+        }
+        for(Table tb : tbs){ // rest tables of the list
+            newTable = Table.join(newTable,tb,"__");  // create a new table joined by a list of table
+        }
+
+        if (newTable == null){
+            return "they do not have any match item in same name columns";
+        }
+
+        List<Column> cols = new ArrayList<>();
+        for(String colStr : colStrs){
+            List<String> colNames = newTable.columnNames;
+            if(colNames.contains(colStr)){
+                int index = colNames.indexOf(colStr);
+                cols.add(newTable.columns.get(index));
+            } else {
+                return String.format("Error: Column %s doesn't exist", colStr);
+            }
+        }
+        Table newTB = new Table("beforeCondition",cols);
+
+        return newTB.toString();
+    }
 
 }
 
