@@ -79,7 +79,7 @@ public class TableHelper {
     static List<Column> rowsToColumns(List<Row> rows, List<String> colNames){
         List<Column> cols = new ArrayList<>();
         for(int colIndex = 0; colIndex < colNames.size(); colIndex++){
-            Class colType = rows.get(0).items.get(0).getClass();
+            Class colType = rows.get(0).items.get(colIndex).getClass();
             Column currCol = new Column(colNames.get(colIndex),colType);
             try {
                 for (Row r : rows) {

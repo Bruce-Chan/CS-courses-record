@@ -1,6 +1,6 @@
 /*
  * TODO: 1. fix the join (Done)
- *       2. Condition
+ *       2. Condition (Done)
  *       3. Operator
  *       4. Check select and Create select table
  *       5. repeated column name and column name to column (map)
@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.File;
 
 import static db.ConditionSelect.conditionEval;
+import static db.ConditionSelect.operationEval;
 import static db.Parse.eval;
 
 
@@ -35,6 +36,7 @@ public class Database {
     private static final Pattern INTEGER_TYPE = Pattern.compile(INTEGER);
     private static final Pattern STRING_TYPE = Pattern.compile(STRING);
     private static final Pattern FLOAT_TYPE = Pattern.compile(FLOAT);
+
     private static Map<String,Table> tableMap;
 
     public Database() {
@@ -137,7 +139,7 @@ public class Database {
                 pw.close();
                 return "";
             } else{
-                return "ERROR: Table not found: "+name;
+                return "ERROR: No such table: "+name;
             }
         } catch (IOException e){
             return ""+e;
@@ -213,15 +215,9 @@ public class Database {
         }
 
         List<Column> cols = new ArrayList<>();
-        for(String colStr : colStrs){
-            List<String> colNames = newTable.columnNames;
-            if(colNames.contains(colStr)){
-                int index = colNames.indexOf(colStr);
-                cols.add(newTable.columns.get(index));
-            } else {
-                throw new Exception(String.format("Error: Column %s doesn't exist", colStr));
-            }
-        }
+
+        cols = operationEval(newTable.columns,colStrs,newTable.columnNames);
+
         cols = conditionEval(cols,conds);
         Table newTB = new Table(name,cols);
 

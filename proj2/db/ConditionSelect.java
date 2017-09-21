@@ -14,6 +14,59 @@ public class ConditionSelect {
     private static final Pattern larger_CMD = Pattern.compile("([^\\s]+)\\s*>\\s*([^\\s]+)");
     private static final Pattern smaller_CMD = Pattern.compile("([^\\s]+)\\s*<\\s*([^\\s]+)");
 
+    private static final Pattern OPERATOR_AS = Pattern.compile("([^/\\s]+)([/*+-])([^/\\s]+)\\s+as\\s+([^\\s]+)");
+
+    static List<Column> operationEval(List<Column> columns, String[] colStrs, List<String> colNames)
+            throws Exception{
+        List<Column> newCols = new ArrayList<>();
+        for(String colStr : colStrs){
+            Column col;
+            Matcher m;
+            if((m=OPERATOR_AS.matcher(colStr)).matches()){
+                Column col1 = getFromColumns(columns,colNames,m.group(1));
+                Column col2 = getFromColumns(columns,colNames,m.group(3));
+                Class t1 = col1.type;
+                Class t2 = col2.type;
+                Column newCol;
+
+                if(m.group(2).equals("+")){
+                    col = Column.plus(col1,col2,m.group(4));
+                } else if(m.group(2).equals("-")){
+                    if(t1.equals(String.class) || t2.equals(String.class)) {
+                        throw new Exception("String cannot do '-' operation");
+                    }
+                    col = Column.sub(col1,col2,m.group(4));
+                } else if(m.group(2).equals("*")){
+                    if(t1.equals(String.class) || t2.equals(String.class)) {
+                        throw new Exception("String cannot do '*' operation");
+                    }
+                    col = Column.multipy(col1,col2,m.group(4));
+                } else if(m.group(2).equals("/")){
+                    if(t1.equals(String.class) || t2.equals(String.class)) {
+                        throw new Exception("String cannot do '/' operation");
+                    }
+                    col = Column.div(col1,col2,m.group(4));
+                }
+                else{
+                    throw new Exception("undefined operator: "+m.group(4));
+                }
+            } else {
+                col = getFromColumns(columns,colNames,colStr);
+            }
+            newCols.add(col);
+        }
+        return newCols;
+    }
+
+    static Column getFromColumns(List<Column> cols, List<String> colNames, String colStr) throws Exception{
+        if(colNames.contains(colStr)){
+            int index = colNames.indexOf(colStr);
+            return cols.get(index);
+        } else {
+            throw new Exception(String.format("Error: Column %s doesn't exist", colStr));
+        }
+    }
+
     static List<Column> conditionEval(List<Column> cols, String[] conds) throws Exception{
         if(conds == null){
             return cols;

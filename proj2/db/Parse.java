@@ -65,12 +65,6 @@ public class Parse {
     }
 
     private static String createNewTable(String name, String[] cols) {
-        StringJoiner joiner = new StringJoiner(", ");
-        for (int i = 0; i < cols.length-1; i++) {
-            joiner.add(cols[i]);
-        }
-
-        String colSentence = joiner.toString() + " and " + cols[cols.length-1];
         String output;
         try {
             output = Database.createNewTable(name, cols).toString();
