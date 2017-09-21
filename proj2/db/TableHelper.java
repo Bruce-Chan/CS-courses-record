@@ -12,7 +12,7 @@ public class TableHelper {
     static void expandItem(List<Column> cols, Row r) throws Exception{
         for(int i = 0; i < cols.size(); i++){
             Column col = cols.get(i);
-            Object item = r.items.get(i);
+            Comparable item = r.items.get(i);
             if(item.getClass().equals(col.type)){
                 col.add(item);
             } else{
@@ -28,7 +28,7 @@ public class TableHelper {
      */
     static void expandItem(List<Row> rows, Column col){
         for(int i = 0; i < rows.size(); i++){
-            rows.get(i).add(col.items.get(i));
+            rows.get(i).add((Comparable) col.items.get(i));
         }
 
     }

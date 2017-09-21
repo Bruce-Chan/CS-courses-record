@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Row {
-    public List<Object> items;
+    public List<Comparable> items;
     public int size;
 
     /* Constructor */
@@ -14,7 +14,7 @@ public class Row {
         size = 0;
     }
 
-    void add(Object item){
+    void add(Comparable item){
         items.add(item);
         size++;
     }

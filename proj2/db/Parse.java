@@ -80,10 +80,16 @@ public class Parse {
         return output;
     }
 
+
     private static String createSelectedTable(String name, String exprs, String tables, String conds) {
-        return String.format("You are trying to create a table named %s by selecting these expressions:" +
-                " '%s' from the join of these tables: '%s', filtered by these conditions: '%s'\n", name, exprs,
-                tables, conds);
+        Table newTable;
+        try {
+            newTable = Database.select(name, exprs, tables, conds);
+        } catch(Exception e){
+            return e+"";
+        }
+
+        return "";
     }
 
     private static String loadTable(String name) {
@@ -122,15 +128,12 @@ public class Parse {
         if (!m.matches()) {
             return String.format("Malformed select: %s\n", expr);
         }
-
-        String[] cols = m.group(1).split(COMMA);
-        String[] tables = m.group(2).split(COMMA);
-        String[] conds;
-        if(m.group(3)==null){
-            conds = null;
-        } else {
-            conds = m.group(3).split(AND);
+        Table newTable;
+        try {
+            newTable = Database.select("__", m.group(1), m.group(2), m.group(3));
+        } catch(Exception e){
+            return e+"";
         }
-        return Database.select(cols,tables,conds);
+        return newTable.toString();
     }
 }

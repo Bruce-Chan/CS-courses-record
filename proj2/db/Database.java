@@ -1,8 +1,9 @@
 /*
  * TODO: 1. fix the join (Done)
  *       2. Condition
- *       3. check select
- *       4. Create select table
+ *       3. Operator
+ *       4. Check select and Create select table
+ *       5. repeated column name and column name to column (map)
  */
 
 package db;
@@ -18,14 +19,18 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.File;
 
-
+import static db.ConditionSelect.conditionEval;
 import static db.Parse.eval;
 
 
 public class Database {
     private static String DATAADDRESS = "out/production/proj2/examples//";
+    private static final String REST  = "\\s*(.*)\\s*",
+            COMMA = "\\s*,\\s*",
+            AND   = "\\s+and\\s+";
+
     private static final String INTEGER = "\\s*(\\d+)\\s*";
-    private static final String STRING = "\'\\.*\'";
+    private static final String STRING = "\'.*\'";
     private static final String FLOAT = "^\\s*([+-]?\\d*\\.\\d*)\\s*$";
     private static final Pattern INTEGER_TYPE = Pattern.compile(INTEGER);
     private static final Pattern STRING_TYPE = Pattern.compile(STRING);
@@ -72,7 +77,7 @@ public class Database {
     /*
      * convert string to correspond type object
      */
-    private static Object strToObj(String str){
+    static Comparable strToObj(String str){
         Matcher m;
         if((m=INTEGER_TYPE.matcher(str)).matches()){
             return Integer.parseInt(m.group(1));
@@ -175,27 +180,36 @@ public class Database {
         }
     }
 
-    static String select(String[] colStrs, String[] tables, String[] conds) {
+    static Table select(String name, String exprs, String tableNames, String condStrs) throws Exception {
+        String[] colStrs = exprs.split(COMMA);
+        String[] tables = tableNames.split(COMMA);
+        String[] conds;
+        if(condStrs==null){
+            conds = null;
+        } else {
+            conds = condStrs.split(AND);
+        }
+
         List<Table> tbs = new ArrayList<>();
         for(String tbStr : tables){
             if(tableMap.containsKey(tbStr)){
                 tbs.add(tableMap.get(tbStr));
             } else {
-                return String.format("Error: table %s doesn't exist",tbStr);
+                throw new Exception(String.format("Error: table %s doesn't exist",tbStr));
             }
         }
         Table newTable;
         if(tbs.size()>=1){
             newTable = tbs.remove(0); // get the first table
         } else {
-            return "Error: didn't select table";
+            throw new Exception("Error: didn't select table");
         }
         for(Table tb : tbs){ // rest tables of the list
             newTable = Table.join(newTable,tb,"__");  // create a new table joined by a list of table
         }
 
         if (newTable == null){
-            return "they do not have any match item in same name columns";
+            throw new Exception("they do not have any match item in same name columns");
         }
 
         List<Column> cols = new ArrayList<>();
@@ -205,12 +219,16 @@ public class Database {
                 int index = colNames.indexOf(colStr);
                 cols.add(newTable.columns.get(index));
             } else {
-                return String.format("Error: Column %s doesn't exist", colStr);
+                throw new Exception(String.format("Error: Column %s doesn't exist", colStr));
             }
         }
-        Table newTB = new Table("beforeCondition",cols);
+        cols = conditionEval(cols,conds);
+        Table newTB = new Table(name,cols);
 
-        return newTB.toString();
+        if(name.equals("__")==false){
+            tableMap.put(name,newTB);
+        }
+        return newTB;
     }
 
 }

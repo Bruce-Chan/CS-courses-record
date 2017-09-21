@@ -3,7 +3,7 @@ package db;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Column <T>{
+public class Column <T extends Comparable>{
     public String name;
     public Class type;
     public List<T> items;
@@ -23,5 +23,8 @@ public class Column <T>{
         size ++;
     }
 
-
+    void remove(int i){
+        items.remove(i);
+        size --;
+    }
 }
