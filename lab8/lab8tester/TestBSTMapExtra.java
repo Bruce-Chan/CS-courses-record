@@ -81,6 +81,14 @@ public class TestBSTMapExtra {
         assertTrue(q.containsKey("f"));
     }
 
+    @Test
+    public void testRemoveDoubleCheck() {
+        BSTMap<String,String> q = new BSTMap<String,String>();
+        q.put("c","a");
+        assertTrue("a".equals(q.remove("c")));      // a b c d
+        assertTrue(null==q.root);
+    }
+
     public static void main(String[] args) {
         jh61b.junit.TestRunner.runTests(TestBSTMapExtra.class);
     }
