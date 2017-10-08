@@ -1,4 +1,4 @@
-package hw3.puzzle;
+package puzzle;
 import edu.princeton.cs.algs4.StdOut;
 
 public class WordPuzzleSolver {
@@ -7,9 +7,9 @@ public class WordPuzzleSolver {
      * your basic functionality. Make sure to set your current working directory
      * to be the one containing words10000.txt.
      **********************************************************************/
-    /*public static void main(String[] args) {
-        String start = "cube";
-        String goal = "tubes";
+    public static void main(String[] args) {
+        String start = "house";
+        String goal = "cup";
 
         Word startState = new Word(start, goal);
         Solver solver = new Solver(startState);
@@ -18,5 +18,5 @@ public class WordPuzzleSolver {
         for (WorldState ws : solver.solution()) {
             StdOut.println(ws);
         }
-    }*/
+    }
 }

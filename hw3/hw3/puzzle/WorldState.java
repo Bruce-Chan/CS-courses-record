@@ -1,4 +1,4 @@
-package hw3.puzzle;
+package puzzle;
 
 public interface WorldState {
     /** Provides an estimate of the number of moves to reach the goal.

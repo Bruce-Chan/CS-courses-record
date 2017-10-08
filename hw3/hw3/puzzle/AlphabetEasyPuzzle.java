@@ -1,4 +1,4 @@
-package hw3.puzzle;
+package puzzle;
 
 import java.util.Set;
 import java.util.HashSet;
