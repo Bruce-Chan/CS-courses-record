@@ -1,4 +1,4 @@
-package hw4.hash;
+package hash;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,14 +13,22 @@ public class HashTableVisualizer {
            nicely, be sure to try
            scale = 0.5, N = 2000, M = 100. */
 
-        double scale = 1.0;
-        int N = 100;
-        int M = 10;
+        double scale = 0.2;
+        int N = 2000;
+        int M = 100;
 
+        /*
         HashTableDrawingUtility.setScale(scale);
         List<Oomage> oomies = new ArrayList<>();
         for (int i = 0; i < N; i += 1) {
             oomies.add(SimpleOomage.randomSimpleOomage());
+        }
+        visualize(oomies, M, scale);
+        */
+        HashTableDrawingUtility.setScale(scale);
+        List<Oomage> oomies = new ArrayList<>();
+        for (int i = 0; i < N; i += 1) {
+            oomies.add(ComplexOomage.randomComplexOomage());
         }
         visualize(oomies, M, scale);
     }

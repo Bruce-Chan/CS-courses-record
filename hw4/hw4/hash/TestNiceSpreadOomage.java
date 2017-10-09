@@ -1,4 +1,4 @@
-package hw4.hash;
+package hash;
 
 import org.junit.Test;
 import static org.junit.Assert.*;

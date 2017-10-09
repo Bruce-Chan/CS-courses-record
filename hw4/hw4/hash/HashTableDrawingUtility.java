@@ -1,4 +1,4 @@
-package hw4.hash;
+package hash;
 import java.awt.Font;
 import edu.princeton.cs.algs4.StdDraw;
 
