@@ -75,7 +75,8 @@ public class AGGraphBuildingTest {
     public void testClosest() {
         double lon = -122.2892;
         double lat = 37.8885;
-        assertEquals(1790732915L, graph.closest(lon, lat));
+        // should be 53042711
+        assertEquals(1790732915, graph.closest(lon, lat));
     }
 
     private <Item> int countIterableItems(Iterable<Item> it) {

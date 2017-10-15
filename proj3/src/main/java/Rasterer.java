@@ -1,4 +1,6 @@
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -8,13 +10,16 @@ import java.util.Map;
  * not draw the output correctly.
  */
 public class Rasterer {
-    // Recommended: QuadTree instance variable. You'll need to make
-    //              your own QuadTree since there is no built-in quadtree in Java.
 
+    public static final double ROOT_ULLAT = 37.892195547244356, ROOT_ULLON = -122.2998046875,
+            ROOT_LRLAT = 37.82280243352756, ROOT_LRLON = -122.2119140625;
+    public static final String IMGFORMAT = ".png";
+    private Quadtree qt;
     /** imgRoot is the name of the directory containing the images.
      *  You may not actually need this for your class. */
     public Rasterer(String imgRoot) {
-        // YOUR CODE HERE
+        Quadtree.Node root = new Quadtree.Node(0,ROOT_ULLAT,ROOT_ULLON,ROOT_LRLAT,ROOT_LRLON,imgRoot,8);
+        qt = new Quadtree(root,8,imgRoot);
     }
 
     /**
@@ -46,14 +51,36 @@ public class Rasterer {
      *                    string. <br>
      * "query_success" -> Boolean, whether the query was able to successfully complete. Don't
      *                    forget to set this to true! <br>
-     * @see #REQUIRED_RASTER_REQUEST_PARAMS
+     * see REQUIRED_RASTER_REQUEST_PARAMS
      */
     public Map<String, Object> getMapRaster(Map<String, Double> params) {
-        // System.out.println(params);
+        Double queryLrlon = params.get("lrlon");
+        Double queryUllon = params.get("ullon");
+        Double queryUllat = params.get("ullat");
+        Double queryLrlat = params.get("lrlat");
+        if(queryLrlon<queryUllon || queryLrlat >queryUllat){
+            System.out.println("the value of longitude and latitude is wrong");
+        }
+        Double width = params.get("w");
+        Double queryxDisPerPixel = (queryLrlon-queryUllon)/width;
         Map<String, Object> results = new HashMap<>();
-        System.out.println("Since you haven't implemented getMapRaster, nothing is displayed in "
-                           + "your browser.");
+        List<List<Quadtree.Node>> tempLst= new ArrayList<>();
+        qt.getRaster(params,qt.root,queryxDisPerPixel,results,tempLst);
+        String[][] filesName = convertNodesListToArray(tempLst);
+        results.put("render_grid",filesName);
         return results;
+    }
+
+    private String[][] convertNodesListToArray(List<List<Quadtree.Node>> lst){
+        String[][] result = new String[lst.size()][];
+        for(int i = 0; i<lst.size();i++){
+            List<Quadtree.Node> currRow= lst.get(i);
+            result[i] = new String[currRow.size()];
+            for(int j = 0; j<currRow.size();j++){
+                result[i][j] = currRow.get(j).dir+IMGFORMAT;
+            }
+        }
+        return result;
     }
 
 }

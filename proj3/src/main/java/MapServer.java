@@ -4,12 +4,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.io.IOException;
@@ -279,7 +274,13 @@ public class MapServer {
      * cleaned <code>prefix</code>.
      */
     public static List<String> getLocationsByPrefix(String prefix) {
-        return new LinkedList<>();
+
+        ArrayList<String> lst = new ArrayList<String>();
+        Iterable<GraphDB.Location> locations = graph.locationTrieST.keysWithPrefix(prefix);
+        for(GraphDB.Location s: locations) {
+            lst.add(s.name);
+        }
+        return lst;
     }
 
     /**
@@ -295,7 +296,18 @@ public class MapServer {
      * "id" -> Number, The id of the node. <br>
      */
     public static List<Map<String, Object>> getLocations(String locationName) {
-        return new LinkedList<>();
+        locationName = locationName.replaceAll("[^a-zA-Z\\s]+","").toLowerCase();
+        List<GraphDB.Location> locations = graph.locationTrieST.keysThatMatch(locationName);
+        List<Map<String, Object>> result= new ArrayList<>();
+        for(GraphDB.Location location : locations){
+            Map<String, Object> map= new HashMap<>();
+            map.put("name",location.name);
+            map.put("lon",location.lon);
+            map.put("id",location.id);
+            map.put("lat",location.lat);
+            result.add(map);
+        }
+        return result;
     }
 
     /** Validates that Rasterer has returned a result that can be rendered.
